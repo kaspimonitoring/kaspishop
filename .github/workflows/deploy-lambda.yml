@@ -32,6 +32,12 @@ jobs:
         env:
           ConnectionStrings.DbConnection: ${{ secrets.DB_CONNECTION }}
 
+      - name: Create ZIP File
+        run: |
+          cd ./publish
+          zip -r ExtractProduct.zip .
+        shell: bash
+
       - name: Deploy Lambda
         run: |
           aws lambda update-function-code \
