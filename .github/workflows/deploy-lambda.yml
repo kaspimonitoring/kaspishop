@@ -1,0 +1,44 @@
+name: Deploy Lambda
+
+on:
+  push:
+    branches:
+      - main  # Replace with the branch you want to trigger from
+env:
+  WORKING_DIRECTORY: ExtractProduct/src/ExtractProduct
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '6.0.x'
+          include-prerelease: true
+
+
+      - name: Build
+        run: dotnet publish "${{ env.WORKING_DIRECTORY }}" -c Release -o ./publish
+
+      - name: App Settings Variable Substitution
+        uses: microsoft/variable-substitution@v1
+        with:
+          files: '**/appsettings.json'
+        env:
+          ConnectionStrings.DbConnection: ${{ secrets.DB_CONNECTION }}
+
+      - name: Deploy Lambda
+        run: |
+          aws lambda update-function-code \
+          --function-name YourLambdaFunctionName \
+          --zip-file fileb://./publish/ExtractProduct.zip  # Replace with your Lambda function details
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: eu-central-1  # Replace with your AWS region
+
