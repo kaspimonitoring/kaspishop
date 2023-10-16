@@ -35,7 +35,7 @@ jobs:
       - name: Deploy Lambda
         run: |
           aws lambda update-function-code \
-          --function-name YourLambdaFunctionName \
+          --function-name ExtractProduct \
           --zip-file fileb://./publish/ExtractProduct.zip  # Replace with your Lambda function details
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
